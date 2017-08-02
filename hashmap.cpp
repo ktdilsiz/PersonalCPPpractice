@@ -1,6 +1,53 @@
 #include <iostream>
 #include <vector>
+#include <cstddef>
 
+struct HashNode{
+
+    HashNode* next;
+    int data;
+    int key;
+    int hashCode;
+
+    HashNode::HashNode(){}
+
+    HashNode::HashNode(
+        HashNode* next, 
+        const int& data, 
+        const int& key, 
+        const int& hashCode
+        ) : next(next), data(data), key(key), hashCode(hashCode)
+        {}
+
+};
+
+class HashMap{
+
+    public:
+        HashMap();
+        HashMap(int tableSize);
+        //~HashMap();
+
+        void put(int key, int value);
+        int get(int key);
+        int deleteEntry(int key, int value);
+
+        int generateHashCode(int number);
+        void HashMap::putToListOfNodes(HashNode& first, HashNode& newNode);
+
+        void printHashMap();
+        void printNodes(HashNode* node);
+
+        bool isEmpty();
+        int getSize();
+
+    private:
+        int size;
+        int tableSize;
+        bool empty;
+        HashNode** table;
+
+};
 
 /*
     Planning HashMap
@@ -40,41 +87,100 @@
     When the user calls isEmpty
         return isEmpty
 
-*/
+*/ 
 
+HashMap::HashMap(){
+    tableSize = 10;
+    empty = true;
+    size = 0;
+    table = new HashNode*[10];
+}
 
-struct HashNode{
+HashMap::HashMap(int tableSizeInput){
+    tableSize = tableSizeInput;
+    empty = true;
+    size = 0;
+    table = new HashNode*[tableSize];
+}
 
-    HashNode* next;
-    int data;
-    int key;
-    int hashCode;
+int HashMap::generateHashCode(int number){
+    return number*31 % tableSize;
+}
 
-    HashNode::HashNode(
-        HashNode* next, 
-        const int& data, 
-        const int& key, 
-        const int& hashCode
-        ) : next(next), data(data), key(key), hashCode(hashCode)
-        {}
+void HashMap::putToListOfNodes(HashNode& first, HashNode& newNode){
+    HashNode temp = first;
+    if(first.key == newNode.key){
+        first.data = newNode.data;
+        return;
+    }else{
+        while(temp.next){
+            if(temp.next->key == newNode.key){
+                temp.next->data = newNode.data;
+                return;
+            }
+        }
+        *temp.next = newNode;
+    }
+}
+
+void HashMap::printNodes(HashNode* node){
+    HashNode* temp = node;
+    
+    while(temp != NULL){
+        std::cout << "| Key: " << temp->key << 
+                " Value: " << temp->data <<
+                " | \t";
+        temp = temp->next;
+    }
+}
+
+void HashMap::printHashMap(){
+    for(int i = 0; i < tableSize; i++){
+        printNodes(table[i]);
+        std::cout << std::endl;
+    }
+}
+
+void HashMap::put(int key, int value){
+    std::cout << key << " " << value << std::endl;
+    int index = generateHashCode(key);
+    std::cout << index << std::endl;
+
+    HashNode* newNode = new HashNode(NULL, value, key, index);
+
+    std::cout << &table[index] << std::endl;
+
+    if(&table[index] != NULL){
+        std::cout << "test" << std::endl;
+        putToListOfNodes(*table[index], *newNode);
+    }else{
+                std::cout << "test2" << index <<  std::endl;
+        table[index] = newNode;
+                std::cout << "test3" << std::endl;
+    }
 
 }
 
-class HashMap{
+int HashMap::get(int key){
 
-    public:
-        HashMap();
-        ~HashMap();
 
-        void put(int key, int value);
-        int get(int key);
+}
+int HashMap::deleteEntry(int key, int value){
 
-        bool isEmpty();
-        int size();
 
-    private:
-        int size();
-        bool isEmpty;
-        HashNode* table;
+}
 
+
+int main(int argc){
+    
+    HashMap map;
+
+    for(int i=1; i < 15; i++){
+        map.put(i, i*2);
+        std::cout << i << " " << i*2 << std::endl;
+    }
+
+    map.printHashMap();
+
+    return 0;
 }
